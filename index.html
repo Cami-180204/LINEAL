@@ -1,50 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Generador de Modelo de Programación Lineal</title>
+  <meta charset="UTF-8" />
+  <title>Generador PL Inteligente</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f4; }
+    body { font-family: Arial; margin: 30px; background: #f9f9f9; }
     textarea, button, pre { width: 100%; margin-top: 10px; font-size: 16px; }
     textarea { height: 150px; padding: 10px; }
-    button { padding: 10px; background-color: green; color: white; border: none; cursor: pointer; }
-    button:hover { background-color: darkgreen; }
-    pre { background: white; padding: 15px; border: 1px solid #ccc; min-height: 120px; }
+    button { padding: 12px; background: #27ae60; color: white; border: none; cursor: pointer; }
+    button:hover { background: #1e874b; }
+    pre { background: white; padding: 15px; border: 1px solid #ccc; min-height: 140px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>💡 Generador de Modelo de Programación Lineal</h1>
-  <label for="enunciado">Escribe el enunciado completo del problema:</label>
-  <textarea id="enunciado" placeholder="Ej: Una empresa produce mesas y sillas..."></textarea>
-  <button onclick="enviarProblema()">🔍 Generar Modelo</button>
 
-  <h2>Resultado:</h2>
-  <pre id="resultado">Aquí aparecerá el modelo generado...</pre>
+  <h1>🧠 Generador de Modelo de Programación Lineal</h1>
+  <textarea id="enunciado" placeholder="Pega aquí tu ejercicio largo..."></textarea>
+  <button onclick="enviarModelo()">Generar Modelo</button>
+
+  <h2>Modelo Generado:</h2>
+  <pre id="resultado">Aquí aparecerá el resultado...</pre>
 
   <script>
-    async function enviarProblema() {
-      const texto = document.getElementById("enunciado").value;
-      const resultadoEl = document.getElementById("resultado");
-
-      resultadoEl.textContent = "⏳ Procesando...";
+    async function enviarModelo() {
+      const texto = document.getElementById("enunciado").value.trim();
+      const salida = document.getElementById("resultado");
+      salida.textContent = "⏳ Procesando... por favor espera ~30 segundos si no responde.";
 
       try {
-        const respuesta = await fetch("https://linear-openai.onrender.com/resolver", {
+        const res = await fetch("https://plmodel.onrender.com/api/modelo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ texto })
+          body: JSON.stringify({ prompt: texto })
         });
-
-        if (!respuesta.ok) {
-          throw new Error("Error al contactar con el servidor.");
-        }
-
-        const data = await respuesta.json();
-        resultadoEl.textContent = data.resultado || "❌ No se pudo generar un modelo válido.";
-      } catch (error) {
-        resultadoEl.textContent = "❌ " + error.message;
+        if (!res.ok) throw new Error("Falló respuesta del servidor.");
+        const data = await res.json();
+        salida.textContent = data.resultado || "❌ No se pudo generar el modelo.";
+      } catch (e) {
+        salida.textContent = "❌ Error: " + e.message;
       }
     }
   </script>
+
 </body>
 </html>
